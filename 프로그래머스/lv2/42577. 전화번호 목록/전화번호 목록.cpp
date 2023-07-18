@@ -3,10 +3,10 @@
 using namespace std;
 
 bool solution(vector<string> phone_book) {
-    set<string> phoneDict;
+    map<string, bool> phoneDict;
     for (vector<string>::iterator it = phone_book.begin(); it != phone_book.end(); it++)
     {
-        phoneDict.insert(*it);
+        phoneDict[*it] = false;
     }
 
     for (vector<string>::iterator it = phone_book.begin(); it != phone_book.end(); it++)
