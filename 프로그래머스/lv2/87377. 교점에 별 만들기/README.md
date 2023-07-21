@@ -1,10 +1,10 @@
 # [level 2] 교점에 별 만들기 - 87377 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/87377) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/87377?language=cpp) 
 
 ### 성능 요약
 
-메모리: 31.7 MB, 시간: 4.32 ms
+메모리: 4.14 MB, 시간: 0.01 ms
 
 ### 구분
 
