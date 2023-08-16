@@ -6,33 +6,35 @@ using namespace std;
 
 string solution(string number, int k)
 {
-	string answer = "";
-	// 0 ~ number.size() - 1 - k 까지만 탐색
-	// 8888912 , k = 4 일 때 9가 맨 앞자리로 오면 9123 밖에 안되므로 올 수가 없음
-	// 7 : 4 
-	// 0) 7, 4 // 0 ~ 3
-	// 1) 6, 3 // 0 ~ 3
-	
-	int search_size = number.size() - k;
-
-	int start_idx = 0;
-	for (int i = 0; i < search_size; i++)
+	list<char> li;
+	for (char c : number)
 	{
-		char max_num = number[start_idx];
-		int max_num_idx = start_idx;
-
-		for (int j = start_idx; j <= k + i; j++)
-		{
-			if (max_num < number[j])
-			{
-				max_num = number[j];
-				max_num_idx = j;
-			}
-		}
-
-		start_idx = max_num_idx + 1;
-		answer += max_num;
+		li.push_back(c);
 	}
 
+	for (int i = 0; i < k; i++)
+	{
+		list<char>::iterator prev_it = li.begin();
+		for (list<char>::iterator it = li.begin(); it != li.end(); ++it)
+		{
+			if (it == li.begin()) continue;
+			else
+			{
+				if (*it > *prev_it)
+				{
+					li.erase(prev_it);
+					break;
+				}
+				prev_it = it;
+			}
+		}
+	}
+
+	string answer = "";
+	while (!li.empty())
+	{
+		answer += li.front();  li.pop_front();
+	}
+	
 	return answer;
 }
