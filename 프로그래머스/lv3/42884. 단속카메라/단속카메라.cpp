@@ -4,29 +4,28 @@
 
 using namespace std;
 
-
 int solution(vector<vector<int>> routes)
 {
-	vector<pair<int, int>> v;
+	priority_queue<pair<int, int>,vector<pair<int,int>>, greater<pair<int,int>>> q;
+
 	for (vector<int>& route : routes)
 	{
-		v.push_back({ route[0], route[1] });
+		q.push({ route[0], route[1] });
 	}
 
-	// 나가는게 빠른 순서대로 정렬
-	sort(v.begin(), v.end(), [](pair<int, int> a, pair<int, int> b) { return a.second < b.second; });
 	int answer = 1;
-	int camera = v[0].second;
-
-	for (int i = 1; i < v.size(); i++)
+	int camera = q.top().second; q.pop();
+	pair<int, int> next;
+	while (!q.empty())
 	{
-		// 겹치지 않는다.
-		if (camera < v[i].first)
+		next = q.top(); q.pop();
+		if (camera < next.first)
 		{
 			answer++;
-			camera = v[i].second;
+			camera = next.second;
 		}
-		// 겹칠 때는 카메라 위치 안바꿔도 된다.
+		// 겹치는 경우 현재 카메라 위치를 그대로 유지
 	}
+
 	return answer;
 }
