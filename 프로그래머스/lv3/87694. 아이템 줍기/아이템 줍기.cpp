@@ -6,9 +6,9 @@ using namespace std;
 
 const int BOUND = 50 * 50;
 
+// 겹쳐진 직사각형 인덱스 누적
 set<int> graph[50][50] = {};
 int dist[50][50] = {};
-pair<int, int> directions[4] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
 int bfs(int start, int end, vector<vector<int>>& v_graph)
 {
@@ -31,15 +31,6 @@ int bfs(int start, int end, vector<vector<int>>& v_graph)
 		}
 	}
 
-	for (int i = 0; i < 50; i++)
-	{
-		for (int j = 0; j < 50; j++)
-		{
-			// printf("%3d ", dist[i * 50 + j]);
-			// printf("%3d ", graph[i][j]);
-		}
-		// cout<< endl;
-	}
 	return dist[end];
 }
 
@@ -52,6 +43,7 @@ bool CheckDuplication(set<int>& s1, set<int>& s2)
 	}
 	for (int e1 : s1)
 	{
+        // 한개보다 많이 겹쳤으면 가장 자리가 아님
 		if (s2.find(e1) != s2.end())
 		{
 			counter++;
@@ -60,28 +52,32 @@ bool CheckDuplication(set<int>& s1, set<int>& s2)
 	return counter == 1;
 }
 
+void AddGraphNode(pair<int, int> curr, pair<int, int> next, vector<vector<int>>& v_graph)
+{
+	if (curr.first * 50 + curr.second < BOUND && next.first * 50 + next.second < BOUND 
+		&& CheckDuplication(graph[curr.first][curr.second], graph[next.first][next.second]))
+	{
+		v_graph[curr.first * 50 + curr.second].push_back(next.first * 50 + next.second);
+		v_graph[next.first * 50 + next.second].push_back(curr.first * 50 + curr.second);
+	}
+}
 int solution(vector<vector<int>> rectangle, int characterX, int characterY, int itemX, int itemY)
 {
 	// idx = y * 50 + x
 	vector <vector<int>> v_graph(BOUND);
 
-
 	for (int i = 0; i < 50; i++)
-	{
 		for (int j = 0; j < 50; j++)
-		{
 			dist[i][j] = -1;
-		}
-	}
 
-	int rect_idx = 0;
+
 	int lx, ly, rx, ry;
-	for (vector<int>& rec : rectangle)
+	for (int rect_idx = 0; rect_idx < rectangle.size(); rect_idx++)
 	{
-		lx = rec[0] - 1;
-		ly = rec[1] - 1;
-		rx = rec[2] - 1;
-		ry = rec[3] - 1;
+		lx = rectangle[rect_idx][0] - 1;
+		ly = rectangle[rect_idx][1] - 1;
+		rx = rectangle[rect_idx][2] - 1;
+		ry = rectangle[rect_idx][3] - 1;
 
 		for (int y = ly; y <= ry; y++)
 		{
@@ -90,7 +86,6 @@ int solution(vector<vector<int>> rectangle, int characterX, int characterY, int 
 				graph[y][x].insert(rect_idx);
 			}
 		}
-		rect_idx++;
 	}
 
 	for (vector<int>& rec : rectangle)
@@ -100,61 +95,23 @@ int solution(vector<vector<int>> rectangle, int characterX, int characterY, int 
 		rx = rec[2] - 1;
 		ry = rec[3] - 1;
 
-
-		// 4, 2 ==> 5, 2
-		// cout<< "------------------1-------------------" << endl;
-
 		for (int y = ly; y <= ry; y++)
 		{
-			if (true)
+			if (y + 1 <= ry)
 			{
-				if (y * 50 + lx < BOUND && (y + 1) * 50 + lx < BOUND && y + 1 <= ry && CheckDuplication(graph[y][lx],graph[y + 1][lx]))
-				{
-					// cout<< y << ", " << lx << " <==> " << (y + 1) << ", " << lx << endl;
-					v_graph[y * 50 + lx].push_back((y + 1) * 50 + lx);
-					v_graph[(y + 1) * 50 + lx].push_back(y * 50 + lx);
-				}
+				AddGraphNode({ y, lx }, { y + 1,lx }, v_graph);
+				AddGraphNode({ y, rx }, { y + 1,rx }, v_graph);
 			}
-		}
-		// cout<< "------------------2-------------------" << endl;
-		for (int y = ly; y <= ry; y++)
-		{
-			if (true)
-			{
-				if (y * 50 + rx < BOUND && (y + 1) * 50 + rx < BOUND && y + 1 <= ry && CheckDuplication(graph[y][rx], graph[y + 1][rx]))
-				{
-					// cout<< y << ", " << rx << " <==> " << (y + 1) << ", " << + rx << endl;
-					v_graph[y * 50 + rx].push_back((y + 1) * 50 + rx);
-					v_graph[(y + 1) * 50 + rx].push_back(y * 50 + rx);
-				}
 
-			}
 		}
-		// cout<< "------------------3-------------------" << endl;
 		for (int x = lx; x <= rx; x++)
 		{
-			if (true)
+			if (x + 1 <= rx)
 			{
-				if (ly * 50 + x < BOUND && ly * 50 + (x + 1) < BOUND && x + 1 <= rx && CheckDuplication(graph[ly][x], graph[ly][x + 1]))
-				{
-					// cout<< ly << ", " <<  x << " <==> " << ly << ", " << (x + 1) << endl;
-					v_graph[ly * 50 + x].push_back(ly * 50 + (x + 1));
-					v_graph[ly * 50 + (x + 1)].push_back(ly * 50 + x);
-				}
+				AddGraphNode({ ly, x }, { ly, x + 1 }, v_graph);
+				AddGraphNode({ ry, x }, { ry, x + 1 }, v_graph);
 			}
-		}
-		// cout<< "------------------4-------------------" << endl;
-		for (int x = lx; x <= rx; x++)
-		{
-			if (true)
-			{
-				if (ry * 50 + x < BOUND && ry * 50 + (x + 1) < BOUND && x + 1 <= rx && CheckDuplication(graph[ry][x], graph[ry][x + 1]))
-				{
-					// cout<< ry << ", " << + x << " <==> " << ry << ", " << (x + 1) << endl;
-					v_graph[ry * 50 + x].push_back(ry * 50 + (x + 1));
-					v_graph[ry * 50 + (x + 1)].push_back(ry * 50 + x);
-				}
-			}
+
 		}
 	}
 
